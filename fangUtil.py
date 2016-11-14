@@ -62,9 +62,8 @@ class FileHelper:
 
 class CmdHelper:
     "command line helper class"
-    def __init__(self,optMap, usage_func):
-        self.__usage_func = usage_func
-        self.__optMap = optMap
+    def __init__(self, optDict):
+        self.__optMap = optDict
 
     def generate(self,argv):
         "generate a map between option and value"
@@ -73,7 +72,7 @@ class CmdHelper:
         try:
             opts, args = getopt.getopt(argv, optcmd)
         except getopt.GetoptError:
-            self.__usage_func()
+            self.usage()
             sys.exit(-1)
         # get opt
         optlist = self.__getoptList()
@@ -105,6 +104,17 @@ class CmdHelper:
                 optlist.append(s)
         return optlist
 
+    def usage(self):
+        nl = '\r\n'
+        nb = '    '
+        usagestr = 'usage:'+nl
+        optlist = self.__getoptList()
+        keys = self.__optMap.keys()
+        for index in range(len(optlist)):
+            usagestr += optlist[index] + nb + self.__optMap[keys[index]]
+        usagestr += nl
+        print usagestr
+
 
 
 class CmdHelper2:
@@ -124,20 +134,55 @@ class CmdHelper2:
         self.__func_opt(opts)
 
 
-class FileLineWrapper:
+class StringUtil:
 
-    def __init__(self, path, symbol):
-        self.__path = path
-        self.__symbol = symbol
+    @classmethod
+    def filter(cls, oldstr, filterstr):
+        "filter the bad char of the string"
+        nstr = ''
+        for letter in oldstr:
+            if -1 == filterstr.find(letter):
+                nstr += letter
+        return nstr
 
-    def generate(self):
-        lineList = []
-        fh = FileHelper(self.__path)
-        fh.open()
+    @classmethod
+    def wrap(cls,oldstr,wrapchar):
+        "wrap the string with wrapchar"
+        nstr =wrapchar + oldstr +wrapchar
+        return nstr
 
-        s = self.__symbol;
-        line = fh.readline()
-        while line:
-            lineList.append(line)
-            line = fh.readline()
-        return  lineList
+    @classmethod
+    def list2str(cls,inputlist):
+        "transform a string list into a string"
+        return ''.join(inputlist)
+
+    @classmethod
+    def str2list(cls,inputstr):
+        "transform a string into list in every char"
+        nl = []
+        for letter in inputstr:
+            nl.append(letter)
+        return nl
+
+
+if __name__ == '__main__':
+    # 1.test CmdHelper
+
+    print 'test CmdHelp'
+    optionDict = {'h': 'help', 'i:': 'inputfile', 'o:': 'outputfile'}
+    ch = CmdHelper(optionDict)
+    reMap = ch.generate(sys.argv[1:])
+    print reMap
+
+    # 2.test CmdHelper2
+    print 'test CmdHelp2'
+
+    # 3.test FileHelper
+
+
+    # 4. test StringFilter
+    t = '1234:'
+    a = ['1','2','ad']
+    print StringUtil.filter(t, ':')
+    print StringUtil.wrap(t,'\'')
+    print StringUtil.list2str(a)
