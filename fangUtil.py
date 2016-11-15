@@ -63,7 +63,7 @@ class FileHelper:
 class CmdHelper:
     "command line helper class"
     def __init__(self, optDict):
-        self.__optMap = optDict
+        self.__optDict = optDict
 
     def generate(self,argv):
         "generate a map between option and value"
@@ -76,18 +76,18 @@ class CmdHelper:
             sys.exit(-1)
         # get opt
         optlist = self.__getoptList()
-        keys = self.__optMap.keys()
-        paramMap = {}
+        keys = self.__optDict.keys()
+        paramDict = {}
         for opt, arg in opts:
             index = optlist.index(opt)
-            paramMap[self.__optMap[keys[index]]] = arg
-        return paramMap
+            paramDict[self.__optDict[keys[index]]] = arg
+        return paramDict
 
 
     def __getoptcmd(self):
         "get option cmd through optMap"
 
-        keys = self.__optMap.keys()
+        keys = self.__optDict.keys()
         optcmd = ''
         for key in keys:
             optcmd += key
@@ -109,9 +109,9 @@ class CmdHelper:
         nb = '    '
         usagestr = 'usage:'+nl
         optlist = self.__getoptList()
-        keys = self.__optMap.keys()
+        keys = self.__optDict.keys()
         for index in range(len(optlist)):
-            usagestr += optlist[index] + nb + self.__optMap[keys[index]]
+            usagestr += optlist[index] + nb + self.__optDict[keys[index]]
         usagestr += nl
         print usagestr
 
@@ -162,6 +162,22 @@ class StringUtil:
         nl = []
         for letter in inputstr:
             nl.append(letter)
+        return nl
+    @classmethod
+    def strsplit(cls, oldstr, splitchar):
+        nl = []
+        index = oldstr.find(splitchar)
+        flag = 0
+        while index != -1:
+            flag = 1
+            nl.append(oldstr[0:index])
+            oldstr = oldstr[index+1:len(oldstr)]
+            index = oldstr.find(splitchar)
+            if -1 == index and len(oldstr) != 0:
+                nl.append(oldstr)
+                break
+        if flag == 0:
+            nl.append(oldstr) # if old string doesn't have splitchar
         return nl
 
 
